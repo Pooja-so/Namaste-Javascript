@@ -32,8 +32,7 @@ function getName() {
  Note: The above result: Even before the whole JS code  start executing memory is allocated for each and every variables and functions with default value i.e., undefined for variable & function variables and whole code of function to function 
     1. variable_name: undefined 
     2. function variable: undefined
-    3. function_name: () {code of function}
-    1 & 2 only if the function is normal function. Not an arrow function
+    3. function_name: () {code of function} -- only if the function is named function. Not an arrow function ---
 -> This is the reason why we are able to access variables and functions before its declaration without any error.
  */
 
@@ -67,6 +66,6 @@ var getMe = function () {
 
 /* 
 -> Anonymous function getMe also behaves like variable. getMe:undefined.
--> In case of Named and Anonymous function, the function behaves just like varibale. So during the memory allocation phase, JS engine will allocate memory for the function_name with the palceholder undefined. That's why invoking function before it's declaration gives TypeError: getMe is not a function
+-> In case of Arrow and Anonymous function, the function behaves just like varibale. So during the memory allocation phase, JS engine will allocate memory for the function_name with the palceholder undefined. That's why invoking function before it's declaration gives TypeError: getMe is not a function
 -> Only in case of Named function, it will allocate memory to the function_name with it's whole block of code as value i.e. it will treat the function_name as function not as variable.
 */
