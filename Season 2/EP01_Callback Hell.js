@@ -19,13 +19,15 @@ Here callback will be handy as we want to write async code.
 
 /* Structure: api.placeOrder(cart, callback(proceedToPayment( payment, callback(sendEmail())))) 
  placeOrder -> proceedToPayment -> sendEmail */
+
 api.placeOrder(cart, function () {
   api.proceedToPayment(payment, function () {
-    api.sendEmailConfirmation(function() {
-        api.updateWallet();
+    api.sendEmailConfirmation(function () {
+      api.updateWallet();
     });
   });
 });
+
 /* How it will execute: JS will execute placeOrder() and 
 then it is the responsibility of placeOrder() to execute proceedToPayment()
 then further it is the responsibility of proceedToPayment() to execute sendEmailConfirmation()
@@ -38,9 +40,9 @@ This leads to the problem known as "Callback Hell" also known as "Pyramid of Dom
 to placeOrder() function i.e it is responsibility of placeOrder() to call back proceedToPayment() 
 when it work is done. But we never know that in future whether placeOrder() will call proceedToPayment() or not.
 */
+
 api.placeOrder(cart, function () {
-  api.proceedToPayment(payment, function () {
-  });
+  api.proceedToPayment(payment, function () {});
 });
 
 /* Summary
@@ -51,4 +53,53 @@ api.placeOrder(cart, function () {
  b. Inversion of control - We lose control of our program because we pass one callabck function into another function
  results in passing the control of that function to another function. 
  SO we will know whether that function will execute the passed callback function in future
+*/
+
+function placeOrder(cart, callback) {
+  console.log("Placing order for:", cart);
+  let orderId = 123; // pretend this came from DB
+  callback(orderId);
+}
+
+function proceedToPayment(orderId, callback) {
+  console.log(`Proceeding to payment for orderId ${orderId}`);
+  let paymentInfo = { orderId, status: "paid" };
+  callback(paymentInfo);
+}
+
+function showOrderSummary(paymentInfo, callback) {
+  console.log(`Showing summary for orderId ${paymentInfo.orderId}`);
+  let summary = { ...paymentInfo, items: ["dress", "food", "clothes"] };
+  callback(summary);
+}
+
+function updateWallet(summary, callback) {
+  console.log(`Updating wallet after payment for orderId ${summary.orderId}`);
+  let walletBalance = 500; // assume new balance
+  callback(walletBalance);
+}
+
+const cart = ["dress", "food", "clothes"];
+
+// Callback hell 😈
+placeOrder(cart, (orderId) => {
+  proceedToPayment(orderId, (paymentInfo) => {
+    showOrderSummary(paymentInfo, (summary) => {
+      updateWallet(summary, (walletBalance) => {
+        console.log("Final wallet balance:", walletBalance);
+      });
+    });
+  });
+});
+
+/*
+Here the flow is:
+1. placeOrder → generates an orderId.
+2. Passes it to proceedToPayment.
+3. That passes payment info to showOrderSummary.
+4. That passes summary to updateWallet.
+5. Finally logs the wallet balance.
+
+This is the classic “pyramid of doom” shape you see in callback hell.
+
 */
